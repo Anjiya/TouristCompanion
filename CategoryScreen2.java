@@ -35,9 +35,27 @@ public class CategoryScreen2 extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         AdapterView.OnItemSelectedListener{
 
+    public static final String MyPREFERENCES = "MyPrefs" ;
+    public static final String categoryKey = "categoryKey";
+
+   // SharedPreferences spCategory;
+
+    String item;
+
     SharedPreferences sp;
     Spinner selectCategory;
     Button btnNext;
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        // On selecting a spinner item
+        item = parent.getItemAtPosition(position).toString();
+        Toast.makeText(parent.getContext(), item, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +68,15 @@ public class CategoryScreen2 extends AppCompatActivity
         selectCategory = (Spinner)findViewById(R.id.spinner_category);
         selectCategory.setOnItemSelectedListener(this);
 
+        final SharedPreferences spCategory = getApplicationContext().getSharedPreferences(MyPREFERENCES, MODE_PRIVATE);
+
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(CategoryScreen2.this, item, Toast.LENGTH_SHORT).show();
+                SharedPreferences.Editor ed = spCategory.edit();
+                ed.putString(categoryKey, item);
+                ed.commit();
                 Intent intent = new Intent(CategoryScreen2.this, GetTimeScreen.class);
                 startActivity(intent);
             }
@@ -60,10 +84,9 @@ public class CategoryScreen2 extends AppCompatActivity
 
         // Spinner Drop down elements
         List<String> categories = new ArrayList<String>();
-        categories.add("Adventure");
-        categories.add("Education");
-        categories.add("Entertainment");
-        categories.add("Shopping");
+        categories.add("historical_places");
+        categories.add("entertainment");
+        categories.add("shopping");
 
         // Creating adapter for spinner
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
@@ -170,16 +193,5 @@ public class CategoryScreen2 extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout2);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        // On selecting a spinner item
-        String item = parent.getItemAtPosition(position).toString();
-        Toast.makeText(parent.getContext(), item, Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
     }
 }

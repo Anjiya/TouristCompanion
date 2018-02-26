@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/currency_converter" android:title="Convert Currency" android:icon="@drawable/currency_icon"/>
+    <item android:id="@+id/view_profile" android:title="View Profile" android:icon="@drawable/profile_icon"/>
+    <item android:id="@+id/book_ride" android:title="Book a Ride" android:icon="@drawable/ride_icon" />
+    <item android:id="@+id/hungry" android:title="Hungry?" android:icon="@drawable/hungry_icon" />
+
+</menu>

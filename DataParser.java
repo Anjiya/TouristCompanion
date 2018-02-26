@@ -26,8 +26,8 @@ public class DataParser {
 
     String placeName = "--NA--";
     String vicinity = "--NA--";
-    String latitude = "";
-    String longitude = "";
+    String latitude = "0.0";
+    String longitude = "0.0";
     String reference = "";
 
     FirebaseDatabase firebasedatabase = FirebaseDatabase.getInstance();
@@ -43,12 +43,20 @@ public class DataParser {
         try {
             if(!googlePlaceJson.isNull("name"))
             {
-                    placeName = googlePlaceJson.getString("name");
+                placeName = googlePlaceJson.getString("name");
             }
             if(!googlePlaceJson.isNull("vicinity"))
             {
                 vicinity = googlePlaceJson.getString("vicinity");
             }
+//            if(!googlePlaceJson.isNull("lat"))
+//            {
+//                latitude = googlePlaceJson.getString("lat");
+//            }
+//            if(!googlePlaceJson.isNull("lng"))
+//            {
+//                longitude = googlePlaceJson.getString("lng");
+//            }
             latitude = googlePlaceJson.getJSONObject("geometry").getJSONObject("location").getString("lat");
             longitude = googlePlaceJson.getJSONObject("geometry").getJSONObject("location").getString("lng");
 
@@ -60,13 +68,15 @@ public class DataParser {
             googlePlacesMap.put("lng", longitude);
             googlePlacesMap.put("reference", reference);
 
-            Log.d(TAG, placeName + ": " + vicinity);
+            Log.e(TAG, placeName + ": " + vicinity + " " + latitude + ": " + longitude);
+
+            Log.e(TAG, latitude + ": " + longitude);
 
             String place_id = myRefPlace.push().getKey();
             String category = "shopping", location = vicinity, place_name = placeName;
             int votes = 0;
             String reviews = "";
-            places p = new places(place_id, category, placeName, vicinity, votes, reviews);
+            places p = new places(place_id, category, placeName, vicinity, latitude, longitude, votes, reviews);
             myRefPlace.push().setValue(p);
 
 

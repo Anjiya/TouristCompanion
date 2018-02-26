@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_cc"
+            android:icon="@drawable/currency_icon"
+            android:title="Convert Currency" />
+        <item
+            android:id="@+id/nav_ride"
+            android:icon="@drawable/ride_icon"
+            android:title="Book A Ride" />
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/profile_icon"
+            android:title="View Profile" />
+        <item
+            android:id="@+id/nav_hungry"
+            android:icon="@drawable/hungry_icon"
+            android:title="Hungry?" />
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Logout" />
+        </menu>
+    </item>
+
+</menu>

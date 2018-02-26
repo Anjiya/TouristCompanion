@@ -1,9 +1,9 @@
 package com.example.lenovo.touristcompanion;
 
-import android.*;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -23,11 +23,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.api.Api;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
@@ -44,16 +39,15 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.FileDescriptor;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import static android.R.attr.data;
+import static com.example.lenovo.touristcompanion.CategoryScreen2.MyPREFERENCES;
+import static com.example.lenovo.touristcompanion.CategoryScreen2.categoryKey;
+import static com.example.lenovo.touristcompanion.R.id.add;
+import static com.example.lenovo.touristcompanion.R.id.map;
 
 public class MapsActivity1 extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -69,11 +63,18 @@ public class MapsActivity1 extends FragmentActivity implements OnMapReadyCallbac
     int PROXIMITY_RADIUS = 10000;
     double latitude, longitude;
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    SharedPreferences sharedPreferences;
     Button entertainment;
     Button confirm_route;
     Button show;
 
     String TAG = "placevicinity";
+
+    String pLat = "";
+    String pLng = "";
+    String pName = "try";
+
+    double Lat = 28.644800, Lng = 77.216721;
 
     FirebaseDatabase firebasedatabase = FirebaseDatabase.getInstance();
     DatabaseReference myRefPlace = firebasedatabase.getReference("places2");
@@ -120,19 +121,38 @@ public class MapsActivity1 extends FragmentActivity implements OnMapReadyCallbac
         show.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String pid = myRefPlace.child("-L2GvpmLNyb1cUzOupR0").child("category").toString();
-                Toast.makeText(MapsActivity1.this, pid, Toast.LENGTH_LONG).show();
-                Query query = myRefPlace.child("places2").child("-L2GvpmLNyb1cUzOupR0").orderByChild("category").equalTo("shopping");
-                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                sharedPreferences = getApplication().getSharedPreferences(MyPREFERENCES, MODE_PRIVATE);
+                String category = sharedPreferences.getString(categoryKey, "");
+                Toast.makeText(MapsActivity1.this, category, Toast.LENGTH_SHORT).show();
+                ValueEventListener q = myRefPlace.orderByChild("category").equalTo(category).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.exists()) {
-                            for(DataSnapshot places2 : dataSnapshot.getChildren()) {
-                                Log.e(TAG, "place found");
+                        if (dataSnapshot.exists()) {
+                            for (DataSnapshot places2 : dataSnapshot.getChildren()) {
+                                Log.e(TAG, "places found");
+                                places p2 = new places();
+                                p2.getPlace_name();
+//                                p2.getLatitude();
+//                                p2.getLongitude();
+//                                String value = dataSnapshot.getValue(String.class);
+//                                Toast.makeText(MapsActivity1.this, value, Toast.LENGTH_LONG).show();
+//                                String place_name = p2.getPlace_name();
+//                                Toast.makeText(MapsActivity1.this, place_name, Toast.LENGTH_SHORT).show();
+                                pName = places2.child("place_name").getValue(String.class);
+                                pLat = places2.child("latitude").getValue(String.class);
+                                pLng = places2.child("longitude").getValue(String.class);
+
+                                Lat = Double.parseDouble(pLat);
+                                Lng = Double.parseDouble(pLng);
+
+                                Toast.makeText(MapsActivity1.this, pName + ": " + Lat + ", " + Lng, Toast.LENGTH_LONG).show();
+
+                                addMarker(mMap);
+
                             }
-                        }
-                        else
-                            Log.e(TAG, "ponka");
+                        } else
+                            Log.e(TAG, "data not found");
+
                     }
 
                     @Override
@@ -140,6 +160,28 @@ public class MapsActivity1 extends FragmentActivity implements OnMapReadyCallbac
 
                     }
                 });
+//                Log.e(TAG, q);
+//                Toast.makeText(MapsActivity1.this, q, Toast.LENGTH_LONG).show();
+//                String pid = myRefPlace.child("-L2GvpmLNyb1cUzOupR0").child("category").toString();
+//                Toast.makeText(MapsActivity1.this, pid, Toast.LENGTH_LONG).show();
+//                Query query = myRefPlace.child("places2").child("-L2GvpmLNyb1cUzOupR0").orderByChild("category").equalTo("shopping");
+//                query.addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        if(dataSnapshot.exists()) {
+//                            for(DataSnapshot places2 : dataSnapshot.getChildren()) {
+//                                Log.e(TAG, "place found");
+//                            }
+//                        }
+//                        else
+//                            Log.e(TAG, "data not found");
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {
+//
+//                    }
+//                });
             }
         });
 
@@ -150,7 +192,7 @@ public class MapsActivity1 extends FragmentActivity implements OnMapReadyCallbac
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(map);
         mapFragment.getMapAsync(this);
     }
 
@@ -197,7 +239,9 @@ public class MapsActivity1 extends FragmentActivity implements OnMapReadyCallbac
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
-
+            LatLng sydney = new LatLng(-33.852, 151.211);
+            googleMap.addMarker(new MarkerOptions().position(sydney)
+                    .title("Marker in Sydney"));
         }
 
     }
@@ -249,7 +293,7 @@ public class MapsActivity1 extends FragmentActivity implements OnMapReadyCallbac
 
             case R.id.btnEntertainment: {
                 mMap.clear();
-                String entertainment = "jewelry_store";
+                String entertainment = "supermarket";
                 url = getUrl(latitude, longitude, entertainment);
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
@@ -381,5 +425,9 @@ public class MapsActivity1 extends FragmentActivity implements OnMapReadyCallbac
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    public void addMarker(GoogleMap map) {
+        map.addMarker(new MarkerOptions().position(new LatLng(Lat, Lng)).title(pName));
     }
 }
